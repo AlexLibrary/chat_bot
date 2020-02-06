@@ -3,54 +3,75 @@
 const commands = {};
 
 /* function */
-class chatBot {
+class ChatBot {
   constructor() {
     this.working = false;
-    this.commands = {
-      start: { answer: },
-      name: { answer: 'name' },
-      number: { answer: 'number' },
-      stop: { answer: 'stop' },
-      weather: { answer: 'weather' }
-    };
+    this.speech = 'Привет я Бот';
+    this.yourName = '';
+    this.start = this.cStart;
+    this.name = this.cName;
+    this.number = this.cNumber;
+    this.stop = this.cStop;
+    this.weather = this.cWeather;
+    this.commands = ['start', 'name', 'number', 'stop', 'weather'];
   }
-  start() {
-    this.working = true;
+
+  toSpeech() {
+    this.createDOMElement();
   }
-  stop() {
-    this.working = false;
+
+  command(text) {
+    const commands = this.commands;
+    text.toLowerCase();
+    for (const item of commands) {
+      if (text.startsWith('/') && text.endsWith(item)) {
+        this[item]();
+      } else if (!text.startsWith('/')){
+        this.speech = `Я не понимаю, введите другую команду!`;
+        this.toSpeech();
+        break;
+      }
+    }
   }
 
   cStart() {
-
-  }
-
-  renderText = text => {
-    const wrongText = `"${text}" Я не понимаю, введите другую команду через / !`;
-
-    text.toLowerCase();
-    if (!text[0] === '/') {
-      return wrongText;
-    };
-
-    text = text.slice(1);
-    for (const command in commands) {
-      if (command == text) {
-        return commands[command].answer
-      }
+    if (!this.working) {
+      this.working = true;
+      this.speech = `Привет, меня зовут Чат-бот, а как зовут тебя?`;
+      this.toSpeech();
+    } else {
+      this.speech = `Вводи команды /name, /number, /stop, /weather`
+      this.toSpeech();
     }
+  }
+  cStop() {
+    if (this.working) {
+      this.working = false;
+      this.speech = `Всего доброго, если хочешь поговорить пиши /start`
+      this.toSpeech();
+    } else {
+      this.speech = `Введите команду /start, для начала общения`
+      this.toSpeech();
+    }
+  }
+  cName() {
 
-    return wrongText;
+  }
+  cNumber() {
+
+  }
+  cWeather() {
+
   }
 
-  answerBot = (text, form) => {
+  createDOMElement() {
+    const form = document.querySelector('.chat__form')
     const element = document.createElement('div');
     element.classList.add('chat__item');
     element.classList.add('chat__item--bot');
-    element.innerText = text;
+    element.innerText = this.speech;
     form.after(element);
   }
-
 }
 
 const searchParent = (element, parentClass = '') => {
@@ -82,26 +103,10 @@ const texting = (event) => {
     return false;
   };
 
-  if (inputValue === '/start') {
-    // startBot();
-    // stopBot();
-  }
-
-  answerBot(renderText(inputValue), form);
-
+  chatBot.command(inputValue);
 }
-/* data */
-const commands = {}
-
-const commands = {
-  start: { answer: 'Привет, меня зовут Чат-бот, а как зовут тебя? /name' },
-  name: { answer: 'name' },
-  number: { answer: 'number' },
-  stop: { answer: 'stop' },
-  weather: { answer: 'weather' }
-};
 
 /* usage */
+const chatBot = new ChatBot;
 const button = document.querySelector('.chat__btn');
-
 button.addEventListener("click", texting, false);
