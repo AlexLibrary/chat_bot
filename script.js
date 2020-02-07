@@ -14,6 +14,8 @@ class ChatBot {
     this.stop = this.cStop;
     this.weather = this.cWeather;
     this.commands = ['start', 'name', 'number', 'stop', 'weather'];
+    this.userCommand = [];
+    this.runCommand = '';
   }
 
   toSpeech() {
@@ -21,12 +23,16 @@ class ChatBot {
   }
 
   command(text) {
-    const commands = this.commands;
     text.toLowerCase();
-    for (const item of commands) {
+    this.userCommand = text.split(' ');
+    if (this.userCommand.length > 1) {
+      text = this.userCommand[0];
+    }
+    for (const item of this.commands) {
       if (text.startsWith('/') && text.endsWith(item)) {
-        this[item]();
-      } else if (!text.startsWith('/')){
+        this.runCommand = this[item];
+        this.runCommand();
+      } else if (!text.startsWith('/')) {
         this.speech = `Я не понимаю, введите другую команду!`;
         this.toSpeech();
         break;
@@ -55,13 +61,37 @@ class ChatBot {
     }
   }
   cName() {
-
+    if (this.working) {
+      if (this.userCommand.length <= 1) {
+        this.speech = `Введи /name YourName`;
+        this.toSpeech();
+      } else {
+        this.yourName = this.userCommand[1];
+        this.speech = `Привет ${this.userCommand[1]}, приятно познакомится. Я умею считать, введи числа которые надо посчитать`
+        this.toSpeech();
+      }
+    } else {
+      this.speech = `Введите команду /start, для начала общения`
+      this.toSpeech();
+    }
   }
   cNumber() {
-
+    if (this.working) {
+      this.speech = ``
+      this.toSpeech();
+    } else {
+      this.speech = `Введите команду /start, для начала общения`
+      this.toSpeech();
+    }
   }
   cWeather() {
-
+    if (this.working) {
+      this.speech = ``
+      this.toSpeech();
+    } else {
+      this.speech = `Введите команду /start, для начала общения`
+      this.toSpeech();
+    }
   }
 
   createDOMElement() {
@@ -102,7 +132,7 @@ const texting = (event) => {
   } else {
     return false;
   };
-
+  // const chatBot = new ChatBot();
   chatBot.command(inputValue);
 }
 
