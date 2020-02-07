@@ -5,7 +5,7 @@ const commands = {};
 /* function */
 class ChatBot {
   constructor() {
-    this.working = false;
+    this.isWorking = false;
     this.speech = 'Привет я Бот';
     this.yourName = '';
     this.start = this.cStart;
@@ -16,33 +16,48 @@ class ChatBot {
     this.commands = ['start', 'name', 'number', 'stop', 'weather'];
     this.userCommand = [];
     this.runCommand = '';
+    this.numbers = [];
+    this.isRunCommandNumber = false;
   }
 
   toSpeech() {
     this.createDOMElement();
   }
 
+  createDOMElement() {
+    const form = document.querySelector('.chat__form')
+    const element = document.createElement('div');
+    element.classList.add('chat__item');
+    element.classList.add('chat__item--bot');
+    element.innerText = this.speech;
+    form.after(element);
+  }
+
   command(text) {
-    text.toLowerCase();
-    this.userCommand = text.split(' ');
-    if (this.userCommand.length > 1) {
-      text = this.userCommand[0];
-    }
-    for (const item of this.commands) {
-      if (text.startsWith('/') && text.endsWith(item)) {
-        this.runCommand = this[item];
-        this.runCommand();
-      } else if (!text.startsWith('/')) {
-        this.speech = `Я не понимаю, введите другую команду!`;
-        this.toSpeech();
-        break;
+    if (text.length === 1) {
+      this.calc(text);
+    } else {
+      text.toLowerCase();
+      this.userCommand = text.split(' ');
+      if (this.userCommand.length > 1) {
+        text = this.userCommand[0];
+      }
+      for (const item of this.commands) {
+        if (text.startsWith('/') && text.endsWith(item)) {
+          this.runCommand = this[item];
+          this.runCommand();
+        } else if (!text.startsWith('/')) {
+          this.speech = `Я не понимаю, введите другую команду!`;
+          this.toSpeech();
+          break;
+        }
       }
     }
   }
 
   cStart() {
-    if (!this.working) {
-      this.working = true;
+    if (!this.isWorking) {
+      this.isWorking = true;
       this.speech = `Привет, меня зовут Чат-бот, а как зовут тебя?`;
       this.toSpeech();
     } else {
@@ -51,8 +66,8 @@ class ChatBot {
     }
   }
   cStop() {
-    if (this.working) {
-      this.working = false;
+    if (this.isWorking) {
+      this.isWorking = false;
       this.speech = `Всего доброго, если хочешь поговорить пиши /start`
       this.toSpeech();
     } else {
@@ -61,7 +76,7 @@ class ChatBot {
     }
   }
   cName() {
-    if (this.working) {
+    if (this.isWorking) {
       if (this.userCommand.length <= 1) {
         this.speech = `Введи /name YourName`;
         this.toSpeech();
@@ -76,16 +91,54 @@ class ChatBot {
     }
   }
   cNumber() {
-    if (this.working) {
-      this.speech = ``
+    if (this.isWorking) {
+      if (this.userCommand.length <= 1) {
+        this.speech = `Введи /number 5,5 без пробела`;
+        this.toSpeech();
+      } else if (this.userCommand.length > 2) {
+        this.speech = `Введи /number 5,5 без пробела`;
+        this.toSpeech();
+      } else {
+        this.numbers = this.userCommand[1].split(',');
+        this.isRunCommandNumber = true;
+        this.speech = `введи одно из действий -, +, *, /`
+        this.toSpeech();
+      }
+    } else {
+      this.speech = `Введите команду /start, для начала общения`
       this.toSpeech();
+    }
+  }
+  calc(operator) {
+    if (this.isWorking) {
+      if (this.isRunCommandNumber) {
+
+        if (operator === '+') this.speech = this.numbers
+          .map(Number)
+          .reduce((acc, cur) => acc + cur);
+        if (operator === '-') this.speech = this.numbers
+          .map(Number)
+          .reduce((acc, cur) => acc - cur);
+        if (operator === '*') this.speech = this.numbers
+          .map(Number)
+          .reduce((acc, cur) => acc * cur);
+        if (operator === '/') this.speech = this.numbers
+          .map(Number)
+          .reduce((acc, cur) => acc / cur);
+
+        this.isRunCommandNumber = false;
+        this.toSpeech();
+      } else {
+        this.speech = `Введите команду /number`
+        this.toSpeech();
+      }
     } else {
       this.speech = `Введите команду /start, для начала общения`
       this.toSpeech();
     }
   }
   cWeather() {
-    if (this.working) {
+    if (this.isWorking) {
       this.speech = ``
       this.toSpeech();
     } else {
@@ -94,14 +147,6 @@ class ChatBot {
     }
   }
 
-  createDOMElement() {
-    const form = document.querySelector('.chat__form')
-    const element = document.createElement('div');
-    element.classList.add('chat__item');
-    element.classList.add('chat__item--bot');
-    element.innerText = this.speech;
-    form.after(element);
-  }
 }
 
 const searchParent = (element, parentClass = '') => {
