@@ -6,7 +6,7 @@ const commands = {};
 class ChatBot {
   constructor() {
     this.isWorking = false;
-    this.speech = 'Привет я Бот';
+    this.speech = 'Привет я Чат-Бот, я знаю команды \n /start \n /name \n /number \n /stop \n /weather';
     this.yourName = '';
     this.start = this.cStart;
     this.name = this.cName;
@@ -25,16 +25,22 @@ class ChatBot {
   }
 
   createDOMElement() {
-    const form = document.querySelector('.chat__form')
+    const content = document.querySelector('.chat__content')
     const element = document.createElement('div');
     element.classList.add('chat__item');
     element.classList.add('chat__item--bot');
     element.innerText = this.speech;
-    form.after(element);
+    content.prepend(element);
+    var img = document.createElement("img");
+    img.setAttribute('src', './images/bot.svg');
+    img.setAttribute('alt', 'bot');
+    // img.setAttribute('height', '1px');
+    // img.setAttribute('width', '1px');
+    element.appendChild(img);
   }
 
   command(text) {
-    if (text.length === 1) {
+    if (this.isOperand(text)) {
       this.calc(text);
     } else {
       text.toLowerCase();
@@ -42,14 +48,21 @@ class ChatBot {
       if (this.userCommand.length > 1) {
         text = this.userCommand[0];
       }
+      this.runCommand = 0;
       for (const item of this.commands) {
         if (text.startsWith('/') && text.endsWith(item)) {
           this.runCommand = this[item];
           this.runCommand();
-        } else if (!text.startsWith('/')) {
+          this.runCommand = 1;
+        }
+      }
+      if (this.runCommand === 0) {
+        if (this.isWorking) {
           this.speech = `Я не понимаю, введите другую команду!`;
           this.toSpeech();
-          break;
+        } else {
+          this.speech = `Введите команду /start, для начала общения`
+          this.toSpeech();
         }
       }
     }
@@ -109,20 +122,19 @@ class ChatBot {
       this.toSpeech();
     }
   }
-  calc(operator) {
+  calc(operand) {
     if (this.isWorking) {
       if (this.isRunCommandNumber) {
-
-        if (operator === '+') this.speech = this.numbers
+        if (operand === '+') this.speech = this.numbers
           .map(Number)
           .reduce((acc, cur) => acc + cur);
-        if (operator === '-') this.speech = this.numbers
+        if (operand === '-') this.speech = this.numbers
           .map(Number)
           .reduce((acc, cur) => acc - cur);
-        if (operator === '*') this.speech = this.numbers
+        if (operand === '*') this.speech = this.numbers
           .map(Number)
           .reduce((acc, cur) => acc * cur);
-        if (operator === '/') this.speech = this.numbers
+        if (operand === '/') this.speech = this.numbers
           .map(Number)
           .reduce((acc, cur) => acc / cur);
 
@@ -137,6 +149,15 @@ class ChatBot {
       this.toSpeech();
     }
   }
+
+  isOperand(text) {
+    if (text === '+' || text === '-' ||
+      text === '*' || text === '/') {
+      return true;
+    }
+    return false
+  }
+
   cWeather() {
     if (this.isWorking) {
       this.speech = ``
@@ -158,30 +179,40 @@ const searchParent = (element, parentClass = '') => {
   return false;
 }
 
-const createChat = (text, form) => {
+const createChat = (text) => {
+  const content = document.querySelector('.chat__content');
   const element = document.createElement('div');
   element.classList.add('chat__item');
   element.classList.add('chat__item--you');
   element.innerText = text;
-  form.after(element);
+  content.prepend(element);
+  var img = document.createElement("img");
+  img.setAttribute('src', './images/bot.svg');
+  img.setAttribute('alt', 'bot');
+  // img.setAttribute('height', '1px');
+  // img.setAttribute('width', '1px');
+  element.appendChild(img);
 }
 
 const texting = (event) => {
   event.preventDefault();
-  const form = searchParent(event.target, 'chat__form');
-  const inputValue = form.querySelector('.chat__input').value;
-  form.querySelector('.chat__input').value = '';
+  const inputValue = document.querySelector('.chat__input').value;
+  document.querySelector('.chat__input').value = '';
 
   if (inputValue !== '') {
-    createChat(inputValue, form)
+    createChat(inputValue);
   } else {
     return false;
   };
-  // const chatBot = new ChatBot();
   chatBot.command(inputValue);
 }
 
 /* usage */
 const chatBot = new ChatBot;
+chatBot.toSpeech();
 const button = document.querySelector('.chat__btn');
 button.addEventListener("click", texting, false);
+
+const appHeight = () => document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`)
+window.addEventListener('resize', appHeight)
+appHeight()

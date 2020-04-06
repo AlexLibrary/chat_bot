@@ -3,34 +3,54 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-  <title>Портфолио Junior верстальщика</title>
+  <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,400i,700,700i&display=swap&subset=cyrillic-ext"
+    rel="stylesheet">
+  <title>Чат Бот</title>
 </head>
 
 <body>
-  <header class="header">
-    <div class="container">
-      <img src="./images/Text-Header.svg" alt="Чат бот">
-    </div>
-  </header>
+  <div class="page">
+    <header class="header">
+      <div class="container">
+        <div class="header__content">
+          <div class="header__logo">
+            <img src="./images/Text-Header.svg" alt="Чат бот">
+          </div>
+          <!-- <div class="header__command">
+            <button class="header__btn" type="button">/start</button>
+            <button class="header__btn" type="button">/stop</button>
+            <button class="header__btn" type="button">/name YourName</button>
+            <button class="header__btn" type="button">/number 8,1</button>
+            <button class="header__btn" type="button">/weather</button>
+          </div> -->
+        </div>
+      </div>
+    </header>
 
-  <section class="chat">
-    <div class="container">
+    <section class="chat">
+      <div class="container">
 
-      <div class="chat__inner">
+        <div class="chat__inner">
 
-        <form class="chat__form" action="/" method="post">
-          <input class="chat__input" type="text" name="name" placeholder="">
-          <button class="chat__btn" type="submit">
-            <img src="./images/Path.svg" alt="Submit Form">
-          </button>
-        </form>
+          <form class="chat__form" action="/" method="post">
+            <input class="chat__input" type="text" name="name" placeholder="" autocomplete="off">
+            <button class="chat__btn" type="submit">
+              <img src="./images/Path.svg" alt="Submit Form">
+            </button>
+          </form>
+
+          <div class="chat__content">
+
+          </div>
+
+        </div>
 
       </div>
+  </div>
 
-    </div>
-
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 
 </html>
